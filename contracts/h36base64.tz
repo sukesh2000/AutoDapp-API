@@ -1,0 +1,10 @@
+parameter string;
+storage   string;
+code
+  {
+    CAR;        # @parameter
+    # == registerAnswer ==
+    # self.data.base64 = params.base # @parameter
+    NIL operation; # list operation : @parameter
+    PAIR;       # pair (list operation) @parameter
+  };

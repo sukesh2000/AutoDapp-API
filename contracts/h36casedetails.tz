@@ -1,0 +1,111 @@
+parameter (or (pair %register (pair (int %age) (string %date)) (pair (string %gender) (string %name))) (pair %registerdoc (address %address) (string %doc)));
+storage   (pair (pair (int %age) (big_map %cont string (list address))) (pair (string %date) (pair (string %gender) (string %name))));
+code
+  {
+    UNPAIR;     # @parameter : @storage
+    IF_LEFT
+      {
+        SWAP;       # @storage : @parameter%register
+        # == register ==
+        # self.data.name = params.name # @storage : @parameter%register
+        UNPAIR;     # pair (int %age) (big_map %cont string (list address)) : pair (string %date) (pair (string %gender) (string %name)) : @parameter%register
+        SWAP;       # pair (string %date) (pair (string %gender) (string %name)) : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        UNPAIR;     # string : pair (string %gender) (string %name) : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        SWAP;       # pair (string %gender) (string %name) : string : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        CAR;        # string : string : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        DUP 4;      # @parameter%register : string : string : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        GET 4;      # string : string : string : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        SWAP;       # string : string : string : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        PAIR;       # pair string string : string : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        SWAP;       # string : pair string string : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        PAIR;       # pair string (pair string string) : pair (int %age) (big_map %cont string (list address)) : @parameter%register
+        SWAP;       # pair (int %age) (big_map %cont string (list address)) : pair string (pair string string) : @parameter%register
+        # self.data.age = params.age # pair (int %age) (big_map %cont string (list address)) : pair string (pair string string) : @parameter%register
+        CDR;        # big_map string (list address) : pair string (pair string string) : @parameter%register
+        DUP 3;      # @parameter%register : big_map string (list address) : pair string (pair string string) : @parameter%register
+        CAR;        # pair (int %age) (string %date) : big_map string (list address) : pair string (pair string string) : @parameter%register
+        CAR;        # int : big_map string (list address) : pair string (pair string string) : @parameter%register
+        PAIR;       # pair int (big_map string (list address)) : pair string (pair string string) : @parameter%register
+        SWAP;       # pair string (pair string string) : pair int (big_map string (list address)) : @parameter%register
+        # self.data.gender = params.gender # pair string (pair string string) : pair int (big_map string (list address)) : @parameter%register
+        GET 4;      # string : pair int (big_map string (list address)) : @parameter%register
+        DUP 3;      # @parameter%register : string : pair int (big_map string (list address)) : @parameter%register
+        GET 3;      # string : string : pair int (big_map string (list address)) : @parameter%register
+        PAIR;       # pair string string : pair int (big_map string (list address)) : @parameter%register
+        # self.data.date = params.date # pair string string : pair int (big_map string (list address)) : @parameter%register
+        DIG 2;      # @parameter%register : pair string string : pair int (big_map string (list address))
+        CAR;        # pair (int %age) (string %date) : pair string string : pair int (big_map string (list address))
+        CDR;        # string : pair string string : pair int (big_map string (list address))
+        PAIR;       # pair string (pair string string) : pair int (big_map string (list address))
+        SWAP;       # pair int (big_map string (list address)) : pair string (pair string string)
+        PAIR;       # pair (pair int (big_map string (list address))) (pair string (pair string string))
+      }
+      {
+        SWAP;       # @storage : @parameter%registerdoc
+        # == registerdoc ==
+        # if ~ (self.data.cont.contains(params.doc)): # @storage : @parameter%registerdoc
+        DUP;        # @storage : @storage : @parameter%registerdoc
+        DUG 2;      # @storage : @parameter%registerdoc : @storage
+        CAR;        # pair (int %age) (big_map %cont string (list address)) : @parameter%registerdoc : @storage
+        CDR;        # big_map string (list address) : @parameter%registerdoc : @storage
+        SWAP;       # @parameter%registerdoc : big_map string (list address) : @storage
+        DUP;        # @parameter%registerdoc : @parameter%registerdoc : big_map string (list address) : @storage
+        DUG 2;      # @parameter%registerdoc : big_map string (list address) : @parameter%registerdoc : @storage
+        CDR;        # string : big_map string (list address) : @parameter%registerdoc : @storage
+        MEM;        # bool : @parameter%registerdoc : @storage
+        IF
+          {
+            SWAP;       # @storage : @parameter%registerdoc
+            # self.data.cont[params.doc].push(params.address) # @storage : @parameter%registerdoc
+            DUP;        # @storage : @storage : @parameter%registerdoc
+            DUG 2;      # @storage : @parameter%registerdoc : @storage
+            UNPAIR;     # pair (int %age) (big_map %cont string (list address)) : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc : @storage
+            UNPAIR;     # int : big_map string (list address) : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc : @storage
+            SWAP;       # big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc : @storage
+            DIG 4;      # @storage : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            CAR;        # pair (int %age) (big_map %cont string (list address)) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            CDR;        # big_map string (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            DUP 5;      # @parameter%registerdoc : big_map string (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            CDR;        # string : big_map string (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            GET;        # option (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            IF_SOME
+              {
+                # of_some: Get-item:19 # @some : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+              }
+              {
+                PUSH int 19; # int : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+                FAILWITH;   # FAILED
+              }; # @some : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            DUP 5;      # @parameter%registerdoc : @some : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            CAR;        # address : @some : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            CONS;       # list address : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            SOME;       # option (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            DIG 4;      # @parameter%registerdoc : option (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name))
+            CDR;        # string : option (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name))
+            UPDATE;     # big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name))
+            SWAP;       # int : big_map string (list address) : pair (string %date) (pair (string %gender) (string %name))
+            PAIR;       # pair int (big_map string (list address)) : pair (string %date) (pair (string %gender) (string %name))
+            PAIR;       # pair (pair int (big_map string (list address))) (pair (string %date) (pair (string %gender) (string %name)))
+          }
+          {
+            SWAP;       # @storage : @parameter%registerdoc
+            # self.data.cont[params.doc] = sp.list([params.address]) # @storage : @parameter%registerdoc
+            UNPAIR;     # pair (int %age) (big_map %cont string (list address)) : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            UNPAIR;     # int : big_map string (list address) : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            SWAP;       # big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            NIL address; # list address : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            DUP 5;      # @parameter%registerdoc : list address : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            CAR;        # address : list address : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            CONS;       # list address : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            SOME;       # option (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name)) : @parameter%registerdoc
+            DIG 4;      # @parameter%registerdoc : option (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name))
+            CDR;        # string : option (list address) : big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name))
+            UPDATE;     # big_map string (list address) : int : pair (string %date) (pair (string %gender) (string %name))
+            SWAP;       # int : big_map string (list address) : pair (string %date) (pair (string %gender) (string %name))
+            PAIR;       # pair int (big_map string (list address)) : pair (string %date) (pair (string %gender) (string %name))
+            PAIR;       # pair (pair int (big_map string (list address))) (pair (string %date) (pair (string %gender) (string %name)))
+          }; # pair (pair int (big_map string (list address))) (pair (string %date) (pair (string %gender) (string %name)))
+      }; # pair (pair int (big_map string (list address))) (pair string (pair string string))
+    NIL operation; # list operation : pair (pair int (big_map string (list address))) (pair string (pair string string))
+    PAIR;       # pair (list operation) (pair (pair int (big_map string (list address))) (pair string (pair string string)))
+  };
